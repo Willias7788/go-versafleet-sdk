@@ -18,12 +18,12 @@ func New(c *client.Client) *Service {
 
 type CustomerListResponse struct {
 	Customers []model.Customer `json:"customers"`
-	Meta      *client.Meta     `json:"meta"`
+	Meta      *model.Meta      `json:"meta"`
 }
 
 // List returns an iterator to list all customers
-func (s *Service) List(ctx context.Context, opts *model.ListOptions) *client.Iterator[model.Customer, *model.ListOptions] {
-	return client.NewIterator(ctx, s.client, "/customers", opts, func(ctx context.Context, path string, opts *model.ListOptions) ([]model.Customer, *client.Meta, error) {
+func (s *Service) List(ctx context.Context, opts *model.CustomerListOptions) *client.Iterator[model.Customer, *model.CustomerListOptions] {
+	return client.NewIterator(ctx, s.client, "/customers", opts, func(ctx context.Context, path string, opts *model.CustomerListOptions) ([]model.Customer, *model.Meta, error) {
 		var resp CustomerListResponse
 		path = fmt.Sprintf("%s?page=%d&per_page=%d", path, opts.Page, opts.PerPage)
 		if err := s.client.Get(ctx, path, &resp); err != nil {

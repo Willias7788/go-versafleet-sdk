@@ -6,13 +6,6 @@ import (
 	"github.com/Willias7788/go-versafleet-sdk/model"
 )
 
-// ListOptions specifies the optional parameters to various List methods that
-// support pagination.
-type ListOptionsooo struct {
-	Page    int `url:"page,omitempty"`
-	PerPage int `url:"per_page,omitempty"`
-}
-
 // Iterator is a helper to iterate over pages of results
 type Iterator[T any, O model.Paginatable] struct {
 	ctx          context.Context
@@ -23,15 +16,8 @@ type Iterator[T any, O model.Paginatable] struct {
 	currentIndex int
 	totalItems   int
 	err          error
-	fetchFunc    func(context.Context, string, O) ([]T, *Meta, error)
-	meta         *Meta
-}
-
-type Meta struct {
-	TotalEntries int `json:"total_entries"`
-	TotalPages   int `json:"total_pages"`
-	CurrentPage  int `json:"current_page"`
-	PerPage      int `json:"per_page"`
+	fetchFunc    func(context.Context, string, O) ([]T, *model.Meta, error)
+	meta         *model.Meta
 }
 
 // NewIterator creates a new iterator.
@@ -41,7 +27,7 @@ func NewIterator[T any, O model.Paginatable](
 	client *Client,
 	path string,
 	opts O,
-	fetchFunc func(context.Context, string, O) ([]T, *Meta, error),
+	fetchFunc func(context.Context, string, O) ([]T, *model.Meta, error),
 ) *Iterator[T, O] {
 	if opts.GetPage() == 0 {
 		opts.SetPage(1)

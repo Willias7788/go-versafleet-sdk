@@ -18,12 +18,12 @@ func New(c *client.Client) *Service {
 
 type TaskListResponse struct {
 	Tasks []model.Task `json:"tasks"`
-	Meta  *client.Meta `json:"meta"`
+	Meta  *model.Meta  `json:"meta"`
 }
 
 // List returns an iterator to list all tasks
 func (s *Service) List(ctx context.Context, opts *model.TaskListOptions) *client.Iterator[model.Task, *model.TaskListOptions] {
-	return client.NewIterator(ctx, s.client, "/tasks", opts, func(ctx context.Context, path string, opts *model.TaskListOptions) ([]model.Task, *client.Meta, error) {
+	return client.NewIterator(ctx, s.client, "/tasks", opts, func(ctx context.Context, path string, opts *model.TaskListOptions) ([]model.Task, *model.Meta, error) {
 		var resp TaskListResponse
 		path = fmt.Sprintf("%s?page=%d&per_page=%d", path, opts.Page, opts.PerPage)
 

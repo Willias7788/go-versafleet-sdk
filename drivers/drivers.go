@@ -29,13 +29,13 @@ type Driver struct {
 }
 
 type DriverListResponse struct {
-	Drivers []Driver     `json:"drivers"`
-	Meta    *client.Meta `json:"meta"`
+	Drivers []Driver    `json:"drivers"`
+	Meta    *model.Meta `json:"meta"`
 }
 
 // List returns an iterator to list all drivers
 func (s *Service) List(ctx context.Context, opts *model.ListOptions) *client.Iterator[Driver, *model.ListOptions] {
-	return client.NewIterator(ctx, s.client, "/drivers", opts, func(ctx context.Context, path string, opts *model.ListOptions) ([]Driver, *client.Meta, error) {
+	return client.NewIterator(ctx, s.client, "/drivers", opts, func(ctx context.Context, path string, opts *model.ListOptions) ([]Driver, *model.Meta, error) {
 		var resp DriverListResponse
 		path = fmt.Sprintf("%s?page=%d&per_page=%d", path, opts.Page, opts.PerPage)
 		if err := s.client.Get(ctx, path, &resp); err != nil {

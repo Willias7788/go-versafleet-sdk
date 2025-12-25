@@ -26,3 +26,11 @@ type BillingAccount struct {
 	Archived      bool      `json:"archived"`
 	Addresses     []Address `json:"addresses"`
 }
+
+type CustomerListOptions struct {
+	ListOptions // Handles Page and PerPage
+
+	// Filters
+	Keyword  string `url:"keyword,omitempty" json:"keyword,omitempty"`
+	Archived *bool  `url:"archived,omitempty" json:"archived,omitempty"`
+}

@@ -77,7 +77,7 @@ func main() {
 	// 7. Use Customers Service
 	customersService := customers.New(c)
 	fmt.Println("\nListing Customers:")
-	custOpt := model.ListOptions{PerPage: 5}
+	custOpt := model.CustomerListOptions{ListOptions: model.ListOptions{PerPage: 5}}
 	custIter := customersService.List(ctx, &custOpt)
 	for custIter.Next() {
 		cust := custIter.Value()

@@ -17,13 +17,13 @@ func New(c *client.Client) *Service {
 }
 
 type JobListResponse struct {
-	Jobs []model.Job  `json:"jobs"`
-	Meta *client.Meta `json:"meta"`
+	Jobs []model.Job `json:"jobs"`
+	Meta *model.Meta `json:"meta"`
 }
 
 // List returns an iterator to list all jobs
 func (s *Service) List(ctx context.Context, opts *model.JobListOptions) *client.Iterator[model.Job, *model.JobListOptions] {
-	return client.NewIterator(ctx, s.client, "/v2/jobs", opts, func(ctx context.Context, path string, opts *model.JobListOptions) ([]model.Job, *client.Meta, error) {
+	return client.NewIterator(ctx, s.client, "/v2/jobs", opts, func(ctx context.Context, path string, opts *model.JobListOptions) ([]model.Job, *model.Meta, error) {
 		var resp JobListResponse
 		// Construct query params manually or use library (resty supports SetQueryParam)
 		// Simulating simplistic approach here.

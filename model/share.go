@@ -60,3 +60,9 @@ func (b *ListOptions) GetPage() int     { return b.Page }
 func (b *ListOptions) SetPage(v int)    { b.Page = v }
 func (b *ListOptions) GetPerPage() int  { return b.PerPage }
 func (b *ListOptions) SetPerPage(v int) { b.PerPage = v }
+
+type Meta struct {
+	TotalPages  int `json:"total"`
+	CurrentPage int `json:"page"`
+	PerPage     int `json:"per_page"`
+}
