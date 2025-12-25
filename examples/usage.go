@@ -37,52 +37,67 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Successfully authenticated (verified via /jobs)!")
+	runJob := false
+	runTask := true
+	runDriver := false
+	runCustomer := false
+	runUpload := true
 
 	// 4. Use Jobs Service
-	jobsService := jobs.New(c)
-
-	// List Jobs
-	fmt.Println("Listing Jobs:")
-	jobOpt := model.JobListOptions{ListOptions: model.ListOptions{PerPage: 5}}
-	iter := jobsService.List(ctx, &jobOpt)
-	for iter.Next() {
-		job := iter.Value()
-		fmt.Printf("- %s (ID: %v)\n", job.JobType, job.ID)
+	if runJob {
+		jobsService := jobs.New(c)
+		fmt.Println("Listing Jobs:")
+		jobOpt := model.JobListOptions{ListOptions: model.ListOptions{PerPage: 5}}
+		iter := jobsService.List(ctx, &jobOpt)
+		for iter.Next() {
+			job := iter.Value()
+			fmt.Printf("- %s (ID: %v)\n", job.JobType, job.ID)
+			break
+		}
+		if err := iter.Err(); err != nil {
+			log.Printf("Error during iteration: %v", err)
+		}
 	}
-	if err := iter.Err(); err != nil {
-		log.Printf("Error during iteration: %v", err)
-	}
 
-	// // 5. Use Tasks Service
-	tasksService := tasks.New(c)
-	fmt.Println("\nListing Tasks:")
-	opt := model.TaskListOptions{ListOptions: model.ListOptions{PerPage: 5}}
-	taskIter := tasksService.List(ctx, &opt)
-	for taskIter.Next() {
-		task := taskIter.Value()
-		fmt.Printf("- Task %s (Type: %s)\n", task.ID, task.Job.JobType)
-		taskId = fmt.Sprintf("%d", task.ID)
+	// 5. Use Tasks Service
+	if runTask {
+		tasksService := tasks.New(c)
+		fmt.Println("\nListing Tasks:")
+		opt := model.TaskListOptions{ListOptions: model.ListOptions{PerPage: 5}}
+		taskIter := tasksService.List(ctx, &opt)
+		for taskIter.Next() {
+			task := taskIter.Value()
+			taskId = fmt.Sprintf("%v", task.ID)
+			fmt.Printf("- Task %d %s (State: %s)\n", task.ID, task.StateUpdatedAt, task.State)
+			break
+		}
 	}
 
 	// 6. Use Drivers Service
-	driversService := drivers.New(c)
-	fmt.Println("\nListing Drivers:")
-	drvOpt := model.ListOptions{PerPage: 5}
-	driverIter := driversService.List(ctx, &drvOpt)
-	for driverIter.Next() {
-		drv := driverIter.Value()
-		fmt.Printf("- Driver %s (Phone: %s)\n", drv.Name, drv.Phone)
+	if runDriver {
+		driversService := drivers.New(c)
+		fmt.Println("\nListing Drivers:")
+		drvOpt := model.ListOptions{PerPage: 5}
+		driverIter := driversService.List(ctx, &drvOpt)
+		for driverIter.Next() {
+			drv := driverIter.Value()
+			fmt.Printf("- Driver %s (Phone: %s)\n", drv.Name, drv.Phone)
+			break
+		}
 	}
 
 	// 7. Use Customers Service
-	customersService := customers.New(c)
-	fmt.Println("\nListing Customers:")
-	custOpt := model.CustomerListOptions{ListOptions: model.ListOptions{PerPage: 5}}
-	custIter := customersService.List(ctx, &custOpt)
-	for custIter.Next() {
-		cust := custIter.Value()
-		fmt.Printf("- Customer %s (%s)\n", cust.Name, cust.Email)
+	if runCustomer {
+		customersService := customers.New(c)
+		fmt.Println("\nListing Customers:")
+		custOpt := model.CustomerListOptions{ListOptions: model.ListOptions{PerPage: 5}}
+		custIter := customersService.List(ctx, &custOpt)
+		for custIter.Next() {
+			cust := custIter.Value()
+			fmt.Printf("- Customer %s (%s)\n", cust.Name, cust.Email)
+			break
 
+		}
 	}
 
 	// // 8. Use Account Service
@@ -104,12 +119,14 @@ func main() {
 			fmt.Printf("Uploaded file URL: %s\n", fileURL)
 		}
 	*/
-	uploadService := upload.New(c)
-	fmt.Println("\nUpload file:")
-	fileURL, err := uploadService.Upload(ctx, taskId, "./test.txt")
-	if err != nil {
-		fmt.Printf("Upload failed: %v\n", err)
-	} else {
-		fmt.Printf("Uploaded file URL: %s\n", fileURL)
+	if runUpload {
+		uploadService := upload.New(c)
+		fmt.Println("\nUpload file:")
+		fileURL, err := uploadService.Upload(ctx, taskId, "./test.csv")
+		if err != nil {
+			fmt.Printf("Upload failed: %v\n", err)
+		} else {
+			fmt.Printf("Uploaded file URL: %s\n", fileURL)
+		}
 	}
 }

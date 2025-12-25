@@ -43,7 +43,7 @@ type Task struct {
 	LastIncompletedLongitude float64              `json:"last_incompleted_longitude"`
 	LastCompletedLatitude    float64              `json:"last_completed_latitude"`
 	LastCompletedLongitude   float64              `json:"last_completed_longitude"`
-	DriverCustomNotes        []DriverNote         `json:"driver_custom_notes"`
+	DriverCustomNotes        DriverNote           `json:"driver_custom_notes"`
 	LineItemValidation       []LineItemValidation `json:"line_item_validation"`
 	Address                  Address              `json:"address"`
 	Job                      Job                  `json:"job"`
@@ -74,27 +74,11 @@ type TaskAssignment struct {
 	Attendant          Entity  `json:"attendant"`
 }
 
-type Entity struct {
-	ID            int    `json:"id"`
-	Name          string `json:"name"`
-	ContactNumber string `json:"contact_number"`
-}
-
 type CustomField struct {
-	ID                       int    `json:"id"`
-	CustomFieldDescriptionID int    `json:"custom_field_description_id"`
+	ID                       *int   `json:"id"`
+	CustomFieldDescriptionID *int   `json:"custom_field_description_id"`
 	Value                    string `json:"value"`
 	Subvalue                 string `json:"subvalue,omitempty"`
-}
-
-type DriverNote struct {
-	ID                       int    `json:"id"`
-	CustomFieldDescriptionID int    `json:"custom_field_description_id"`
-	Value                    string `json:"value"`
-}
-
-type Skill struct {
-	Name string `json:"name"`
 }
 
 type TaskListOptions struct {

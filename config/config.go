@@ -49,7 +49,7 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	fmt.Println(cfg)
+	// fmt.Println(cfg)
 
 	return &cfg, nil
 }
