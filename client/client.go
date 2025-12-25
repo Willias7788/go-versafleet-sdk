@@ -26,10 +26,14 @@ func New(cfg *config.Config) *Client {
 	r := resty.New()
 	r.SetBaseURL(cfg.BaseURL)
 	r.SetTimeout(time.Minute) // Default timeout
-	
+
 	if cfg.Debug {
 		r.SetDebug(true)
 	}
+
+	// User indicated that auth might be via query params
+	r.SetQueryParam("client_id", cfg.ClientID)
+	r.SetQueryParam("client_secret", cfg.ClientSecret)
 
 	c := &Client{
 		http:    r,
@@ -40,17 +44,18 @@ func New(cfg *config.Config) *Client {
 	r.SetRetryCount(3)
 	r.SetRetryWaitTime(500 * time.Millisecond)
 	r.SetRetryMaxWaitTime(2000 * time.Millisecond)
-	
+
 	// Error hook to parse API errors
 	r.OnAfterResponse(func(c *resty.Client, resp *resty.Response) error {
 		if resp.IsError() {
 			apiErr := &APIError{
 				StatusCode: resp.StatusCode(),
 				RequestID:  resp.Header().Get("X-Request-Id"),
+				// Message:    resp.Request.URL,
 			}
 			// Attempt to unmarshal body into error
 			_ = json.Unmarshal(resp.Body(), apiErr)
-			
+
 			// If message is empty, use status text
 			if apiErr.Message == "" {
 				apiErr.Message = http.StatusText(resp.StatusCode())
@@ -63,61 +68,25 @@ func New(cfg *config.Config) *Client {
 	return c
 }
 
-// Authenticate performs the client credentials flow to obtain an access token
-func (c *Client) Authenticate(ctx context.Context) error {
-	// Simple implementation of Client Credentials flow
-	// Adjust endpoint and payload as per specific API docs if different, 
-	// standard oauth2 usually involves /oauth/token
-	
-	type authRequest struct {
-		ClientID     string `json:"client_id"`
-		ClientSecret string `json:"client_secret"`
-		GrantType    string `json:"grant_type"`
-		Scope        string `json:"scope,omitempty"`
-	}
-	
-	type authResponse struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
+// Verify checks the credentials by making a lightweight API call (e.g. List Jobs with limit 1)
+func (c *Client) Verify(ctx context.Context) error {
+	// Attempt to list jobs with a small limit to verify auth
+	// We use raw http request here to avoid circular dependency if we used jobs package
+	// But simply checking if we get a 200 OK from an endpoint is enough.
 
-	payload := authRequest{
-		ClientID:     c.config.ClientID,
-		ClientSecret: c.config.ClientSecret,
-		GrantType:    "client_credentials",
-	}
-
-	var authResp authResponse
-	// Note: We bypass the OnAfterResponse error check for Auth if structure differs, 
-	// or we can handle it. For now, we assume standard behavior.
-	
-	// Waiting for rate limiter
-	if err := c.limiter.Wait(ctx); err != nil {
-		return err
-	}
-
-	resp, err := c.http.R().
-		SetContext(ctx).
-		SetBody(payload).
-		SetResult(&authResp).
-		Post("/oauth/token")
+	// Assuming /jobs is a valid endpoint that requires auth.
+	resp, err := c.R(ctx).
+		SetQueryParam("per_page", "1").
+		Get("/v2/jobs")
 
 	if err != nil {
 		return err
 	}
-	
-	// Check specifically for auth failure if not caught by hook
+
 	if resp.IsError() {
-		return fmt.Errorf("authentication failed: %s", resp.String())
+		return fmt.Errorf("verification failed: %s", resp.String())
 	}
 
-	c.Token = authResp.AccessToken
-	c.ExpiresAt = time.Now().Add(time.Duration(authResp.ExpiresIn) * time.Second)
-	
-	// Set the token for future requests
-	c.http.SetAuthToken(c.Token)
-	
 	return nil
 }
 

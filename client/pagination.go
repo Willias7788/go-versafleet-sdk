@@ -2,27 +2,29 @@ package client
 
 import (
 	"context"
+
+	"github.com/Willias7788/go-versafleet-sdk/model"
 )
 
 // ListOptions specifies the optional parameters to various List methods that
 // support pagination.
-type ListOptions struct {
+type ListOptionsooo struct {
 	Page    int `url:"page,omitempty"`
 	PerPage int `url:"per_page,omitempty"`
 }
 
 // Iterator is a helper to iterate over pages of results
-type Iterator[T any] struct {
-	ctx         context.Context
-	client      *Client
-	path        string
-	listOptions ListOptions
-	items       []T
+type Iterator[T any, O model.Paginatable] struct {
+	ctx          context.Context
+	client       *Client
+	path         string
+	listOptions  O
+	items        []T
 	currentIndex int
-	totalItems  int
-	err         error
-	fetchFunc   func(context.Context, string, ListOptions) ([]T, *Meta, error)
-	meta        *Meta
+	totalItems   int
+	err          error
+	fetchFunc    func(context.Context, string, O) ([]T, *Meta, error)
+	meta         *Meta
 }
 
 type Meta struct {
@@ -32,23 +34,23 @@ type Meta struct {
 	PerPage      int `json:"per_page"`
 }
 
-// NewIterator creates a new iterator. 
+// NewIterator creates a new iterator.
 // fetchFunc is a closure that calls the specific API endpoint.
-func NewIterator[T any](
-	ctx context.Context, 
-	client *Client, 
-	path string, 
-	opts ListOptions,
-	fetchFunc func(context.Context, string, ListOptions) ([]T, *Meta, error),
-) *Iterator[T] {
-	if opts.Page == 0 {
-		opts.Page = 1
+func NewIterator[T any, O model.Paginatable](
+	ctx context.Context,
+	client *Client,
+	path string,
+	opts O,
+	fetchFunc func(context.Context, string, O) ([]T, *Meta, error),
+) *Iterator[T, O] {
+	if opts.GetPage() == 0 {
+		opts.SetPage(1)
 	}
-	if opts.PerPage == 0 {
-		opts.PerPage = 20
+	if opts.GetPerPage() == 0 {
+		opts.SetPerPage(20)
 	}
 
-	return &Iterator[T]{
+	return &Iterator[T, O]{
 		ctx:         ctx,
 		client:      client,
 		path:        path,
@@ -59,7 +61,7 @@ func NewIterator[T any](
 
 // Next returns the next item in the iteration.
 // It returns true if there is a next item, false otherwise.
-func (it *Iterator[T]) Next() bool {
+func (it *Iterator[T, O]) Next() bool {
 	if it.err != nil {
 		return false
 	}
@@ -67,20 +69,20 @@ func (it *Iterator[T]) Next() bool {
 	// detailed logic:
 	// if we have items and index is within range, use it.
 	// if index is at end of items, check if we can fetch more.
-	
+
 	if it.currentIndex < len(it.items) {
 		it.currentIndex++
 		return true
 	}
 
 	// Need to fetch more?
-	if it.meta != nil && it.listOptions.Page >= it.meta.TotalPages {
+	if it.meta != nil && it.listOptions.GetPage() >= it.meta.TotalPages {
 		return false // No more pages
 	}
-	
+
 	// If it's not the first run, increment page
 	if it.meta != nil {
-		it.listOptions.Page++
+		it.listOptions.SetPage(it.listOptions.GetPage() + 1)
 	}
 
 	items, meta, err := it.fetchFunc(it.ctx, it.path, it.listOptions)
@@ -88,7 +90,7 @@ func (it *Iterator[T]) Next() bool {
 		it.err = err
 		return false
 	}
-	
+
 	if len(items) == 0 {
 		return false
 	}
@@ -100,7 +102,7 @@ func (it *Iterator[T]) Next() bool {
 }
 
 // Value returns the current item.
-func (it *Iterator[T]) Value() T {
+func (it *Iterator[T, O]) Value() T {
 	if len(it.items) == 0 || it.currentIndex-1 < 0 || it.currentIndex-1 >= len(it.items) {
 		var zero T
 		return zero
@@ -109,6 +111,6 @@ func (it *Iterator[T]) Value() T {
 }
 
 // Err returns any error that occurred during iteration.
-func (it *Iterator[T]) Err() error {
+func (it *Iterator[T, O]) Err() error {
 	return it.err
 }

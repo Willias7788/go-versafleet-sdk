@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -28,12 +29,27 @@ func Load() (*Config, error) {
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
-	_ = viper.ReadInConfig() // Ignore error if config file not found
+	err := viper.ReadInConfig() // Ignore error if config file not found
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("No config file found (using env/defaults only)")
+		} else {
+			fmt.Printf("Config file found but error occurred: %v\n", err)
+		}
+	} else {
+		fmt.Println("Config file successfully loaded:", viper.ConfigFileUsed())
+	}
+
+	// settings := viper.AllSettings()
+	// out, _ := json.MarshalIndent(settings, "", "  ")
+	// fmt.Printf("--- VIPER DEBUG ---\n%s\n-------------------\n", string(out))
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+
+	fmt.Println(cfg)
 
 	return &cfg, nil
 }
