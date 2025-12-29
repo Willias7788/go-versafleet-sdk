@@ -45,7 +45,7 @@ type Task struct {
 	LastCompletedLongitude   float64              `json:"last_completed_longitude"`
 	DriverCustomNotes        DriverNote           `json:"driver_custom_notes"`
 	LineItemValidation       []LineItemValidation `json:"line_item_validation"`
-	Address                  Address              `json:"address"`
+	Address                  *Address             `json:"address"`
 	Job                      Job                  `json:"job"`
 	Measurements             []Measurement        `json:"measurements"`
 	CustomFields             []CustomField        `json:"custom_fields"`
@@ -75,34 +75,21 @@ type TaskAssignment struct {
 }
 
 type CustomField struct {
-	ID                       *int   `json:"id"`
+	ID                       *int   `json:"id,omitempty"`
 	CustomFieldDescriptionID *int   `json:"custom_field_description_id"`
 	Value                    string `json:"value"`
 	Subvalue                 string `json:"subvalue,omitempty"`
 }
 
 type TaskListOptions struct {
-	// Date & Time Filters (Optional)
-	Date          *string `url:"date,omitempty" json:"date,omitempty"`
-	FromDateTime  *string `url:"from_datetime,omitempty" json:"from_datetime,omitempty"`
-	ToDateTime    string  `url:"to_datetime,omitempty" json:"to_datetime,omitempty"`
+	CommonListOptions
+
+	// Task specific filters
 	FromCreatedAt *string `url:"from_created_at,omitempty" json:"from_created_at,omitempty"`
 	ToCreatedAt   *string `url:"to_created_at,omitempty" json:"to_created_at,omitempty"`
 	TimeType      *string `url:"time_type,omitempty" json:"time_type,omitempty"`
-
-	// Search & State (Optional)
-	Keyword    *string `url:"keyword,omitempty" json:"keyword,omitempty"`
-	State      *string `url:"state,omitempty" json:"state,omitempty"`
-	Archived   *bool   `url:"archived,omitempty" json:"archived,omitempty"`
-	TrackingID *string `url:"tracking_id,omitempty" json:"tracking_id,omitempty"`
-
-	// Identifiers (Optional)
-	CustomerID *int `url:"customer_id,omitempty" json:"customer_id,omitempty"`
-	JobID      *int `url:"job_id,omitempty" json:"job_id,omitempty"`
-	ID         *int `url:"id,omitempty" json:"id,omitempty"`
-
-	// Pagination (Often has defaults)
-	ListOptions
-	SortBy  *string `url:"sort_by,omitempty" json:"sort_by,omitempty"`
-	OrderBy *string `url:"order_by,omitempty" json:"order_by,omitempty"`
+	TrackingID    *string `url:"tracking_id,omitempty" json:"tracking_id,omitempty"`
+	CustomerID    *int    `url:"customer_id,omitempty" json:"customer_id,omitempty"`
+	JobID         *int    `url:"job_id,omitempty" json:"job_id,omitempty"`
+	ID            *int    `url:"id,omitempty" json:"id,omitempty"`
 }

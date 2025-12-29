@@ -8,7 +8,7 @@ import (
 // APIError represents an error returned by the VersaFleet API
 type APIError struct {
 	StatusCode int         `json:"-"`
-	Message    string      `json:"message"`
+	Message    interface{} `json:"message"`
 	Errors     interface{} `json:"errors,omitempty"` // Can be a map or list details
 	RequestID  string      `json:"request_id,omitempty"`
 }

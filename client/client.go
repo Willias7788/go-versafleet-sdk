@@ -51,9 +51,10 @@ func New(cfg *config.Config) *Client {
 			apiErr := &APIError{
 				StatusCode: resp.StatusCode(),
 				RequestID:  resp.Header().Get("X-Request-Id"),
-				Message:    resp.Request.URL,
+				// Message:    resp.Request.URL,
 			}
 			// Attempt to unmarshal body into error
+			// fmt.Println(string(resp.Body()))
 			_ = json.Unmarshal(resp.Body(), apiErr)
 
 			// If message is empty, use status text

@@ -1,14 +1,15 @@
 package model
 
 type Customer struct {
-	ID            int    `json:"id"`
-	GUID          string `json:"guid"`
-	Name          string `json:"name"`
-	Email         string `json:"email"`
-	ContactPerson string `json:"contact_person"`
-	ContactNumber string `json:"contact_number"`
-	LogoURL       string `json:"logo_url"`
-	Archived      bool   `json:"archived"`
+	ID                        int             `json:"id"`
+	GUID                      string          `json:"guid"`
+	Name                      string          `json:"name"`
+	Email                     string          `json:"email"`
+	ContactPerson             string          `json:"contact_person"`
+	ContactNumber             string          `json:"contact_number"`
+	LogoURL                   string          `json:"logo_url"`
+	Archived                  bool            `json:"archived"`
+	BillingAccountsAttributes *BillingAccount `json:"billing_accounts_attributes,omitempty"`
 }
 
 type CustomerDetail struct {
@@ -17,20 +18,17 @@ type CustomerDetail struct {
 }
 
 type BillingAccount struct {
-	ID            int       `json:"id"`
-	GUID          string    `json:"guid"`
-	Name          string    `json:"name"`
-	Email         string    `json:"email"`
-	ContactPerson string    `json:"contact_person"`
-	ContactNumber string    `json:"contact_number"`
-	Archived      bool      `json:"archived"`
-	Addresses     []Address `json:"addresses"`
+	ID                  int       `json:"id,omitempty"`
+	GUID                string    `json:"guid,omitempty"`
+	Name                string    `json:"name"`
+	Email               string    `json:"email"`
+	ContactPerson       string    `json:"contact_person"`
+	ContactNumber       string    `json:"contact_number"`
+	Archived            bool      `json:"archived"`
+	Addresses           []Address `json:"addresses,omitempty"`
+	AddressesAttributes *Address  `json:"addresses_attributes,omitempty"`
 }
 
 type CustomerListOptions struct {
-	ListOptions // Handles Page and PerPage
-
-	// Filters
-	Keyword  string `url:"keyword,omitempty" json:"keyword,omitempty"`
-	Archived *bool  `url:"archived,omitempty" json:"archived,omitempty"`
+	CommonListOptions
 }

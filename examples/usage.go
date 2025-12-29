@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	// "github.com/Willias7788/go-versafleet-sdk/account"
 	"github.com/Willias7788/go-versafleet-sdk/client"
@@ -28,6 +29,8 @@ func main() {
 	// 2. Initialize Client
 	c := client.New(cfg)
 	taskId := ""
+	customerId := -1
+	billingAccountId := -1
 
 	// 3. Verify Credentials (Login check)
 	ctx := context.Background()
@@ -37,21 +40,27 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Successfully authenticated (verified via /jobs)!")
-	runJob := false
-	runTask := true
-	runDriver := false
-	runCustomer := false
+	runJob := true
+	runTask := false
+	runDriver := true
+	runCustomer := true
 	runUpload := true
+	runCreateJob := true
+	jobService := jobs.New(c)
+	tasksService := tasks.New(c)
+	driversService := drivers.New(c)
+	customersService := customers.New(c)
 
 	// 4. Use Jobs Service
 	if runJob {
-		jobsService := jobs.New(c)
 		fmt.Println("Listing Jobs:")
-		jobOpt := model.JobListOptions{ListOptions: model.ListOptions{PerPage: 5}}
-		iter := jobsService.List(ctx, &jobOpt)
+		jobOpt := model.JobListOptions{}
+		jobOpt.PerPage = 5
+		iter := jobService.List(ctx, &jobOpt)
 		for iter.Next() {
 			job := iter.Value()
-			fmt.Printf("- %s (ID: %v)\n", job.JobType, job.ID)
+			taskId = fmt.Sprintf("%v", job.BaseTask.ID)
+			fmt.Printf("- %s (ID: %v), TaskId: %v\n", job.JobType, job.ID, job.BaseTask.ID)
 			break
 		}
 		if err := iter.Err(); err != nil {
@@ -61,13 +70,13 @@ func main() {
 
 	// 5. Use Tasks Service
 	if runTask {
-		tasksService := tasks.New(c)
 		fmt.Println("\nListing Tasks:")
-		opt := model.TaskListOptions{ListOptions: model.ListOptions{PerPage: 5}}
+		opt := model.TaskListOptions{}
+		opt.PerPage = 5
 		taskIter := tasksService.List(ctx, &opt)
 		for taskIter.Next() {
 			task := taskIter.Value()
-			taskId = fmt.Sprintf("%v", task.ID)
+			// taskId = fmt.Sprintf("%v", task.ID)
 			fmt.Printf("- Task %d %s (State: %s)\n", task.ID, task.StateUpdatedAt, task.State)
 			break
 		}
@@ -75,7 +84,6 @@ func main() {
 
 	// 6. Use Drivers Service
 	if runDriver {
-		driversService := drivers.New(c)
 		fmt.Println("\nListing Drivers:")
 		drvOpt := model.ListOptions{PerPage: 5}
 		driverIter := driversService.List(ctx, &drvOpt)
@@ -88,15 +96,47 @@ func main() {
 
 	// 7. Use Customers Service
 	if runCustomer {
-		customersService := customers.New(c)
 		fmt.Println("\nListing Customers:")
-		custOpt := model.CustomerListOptions{ListOptions: model.ListOptions{PerPage: 5}}
+		custOpt := model.CustomerListOptions{}
+		custOpt.PerPage = 5
 		custIter := customersService.List(ctx, &custOpt)
 		for custIter.Next() {
 			cust := custIter.Value()
 			fmt.Printf("- Customer %s (%s)\n", cust.Name, cust.Email)
+			customerId = cust.ID
 			break
 
+		}
+	}
+
+	if runCreateJob {
+		fmt.Println("\nCreating Job:")
+		timeFrom := time.Now().Format("2006-01-02 15:04:05")
+		timeTo := time.Now().Add(time.Hour * 24).Format("2006-01-02 15:04:05")
+		timeType := model.TimeTypeAllDay
+		job := model.JobParams{
+			BaseTaskAttributes: &model.BaseTaskParams{
+				TimeFrom:         &timeFrom,
+				TimeTo:           &timeTo,
+				TimeType:         &timeType,
+				BillingAccountID: &billingAccountId,
+				AddressAttributes: &model.Address{
+					Line1:   "123 Main St",
+					City:    "Anytown",
+					Country: "Singapore",
+					Zip:     "609254",
+				},
+			},
+
+			JobType:    "delivery",
+			CustomerID: customerId,
+		}
+		_ = billingAccountId
+		jobCreated, err := jobService.Create(ctx, &job)
+		if err != nil {
+			fmt.Printf("Error creating job: %v\n", err)
+		} else {
+			fmt.Printf("Job created: %s (ID: %v)\n", jobCreated.JobType, jobCreated.ID)
 		}
 	}
 

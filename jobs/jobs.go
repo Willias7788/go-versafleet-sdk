@@ -50,11 +50,29 @@ func (s *Service) Get(ctx context.Context, id string) (*model.Job, error) {
 }
 
 // Create creates a new job
-func (s *Service) Create(ctx context.Context, job *model.Job) (*model.Job, error) {
-	var createdJob model.Job
+func (s *Service) Create(ctx context.Context, job *model.JobParams) (*model.Job, error) {
+	var createdJob model.JobResponse
 	err := s.client.Post(ctx, "/v2/jobs", job, &createdJob)
 	if err != nil {
 		return nil, err
 	}
-	return &createdJob, nil
+	return &createdJob.Job, nil
+}
+
+func (s *Service) Update(ctx context.Context, jobId string, job *model.JobParams) (*model.Job, error) {
+	var updatedJob model.JobResponse
+	err := s.client.Put(ctx, fmt.Sprintf("/v2/jobs/%s", jobId), job, &updatedJob)
+	if err != nil {
+		return nil, err
+	}
+	return &updatedJob.Job, nil
+}
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	path := fmt.Sprintf("/v2/jobs/%s", id)
+	err := s.client.Delete(ctx, path)
+	if err != nil {
+		return err
+	}
+	return nil
 }
