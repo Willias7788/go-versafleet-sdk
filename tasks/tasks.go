@@ -44,3 +44,17 @@ func (s *Service) Get(ctx context.Context, id string) (*model.Task, error) {
 	}
 	return &task, nil
 }
+
+// Get retrieves a single task by ID
+func (s *Service) Update(ctx context.Context, id string, taskUpdate *model.TaskParams) (*model.Task, error) {
+	var task model.Task
+	path := fmt.Sprintf("/tasks/%s", id)
+	taskRequest := model.TaskRequest{
+		TaskAttributes: *taskUpdate,
+	}
+	err := s.client.Put(ctx, path, taskRequest, &task)
+	if err != nil {
+		return nil, err
+	}
+	return &task, nil
+}

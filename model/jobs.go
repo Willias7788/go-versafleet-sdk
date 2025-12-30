@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 type Job struct {
 	ID       int      `json:"id"`
 	GUID     string   `json:"guid"`
@@ -41,34 +39,31 @@ type BaseTaskParams struct {
 	TimeTo            *string   `json:"time_to,omitempty"`
 	TimeType          *TimeType `json:"time_type,omitempty"` // am - Morning time range from 00:00 till 12:00, pm -  Afternoon time range from 12:00 till 23:59, all_day - All day time range ranging from 00:00 till 23:59, custom - Pickup time range is specified by `time_from` and `time_to` attributes, null - If time_window_id is provided
 	TimeWindowID      *int      `json:"time_window_id,omitempty"`
+	InvoiceNumber     *string   `json:"invoice_number,omitempty"`
 	ServiceTime       int       `json:"service_time,omitempty"`
 	AddressAttributes *Address  `json:"address_attributes,omitempty"`
 	BillingAccountID  *int      `json:"billing_account_id,omitempty"`
 }
 
-// TaskParams for sub-tasks of a job
-type TaskParams struct {
-	ID                   int                 `json:"id,omitempty"`       // For Update
-	Destroy              bool                `json:"_destroy,omitempty"` // For Update
-	Price                float64             `json:"price,omitempty"`
-	InvoiceNumber        string              `json:"invoice_number,omitempty"`
-	TrackingID           string              `json:"tracking_id,omitempty"`
-	TimeFrom             *time.Time          `json:"time_from,omitempty"`
-	TimeTo               *time.Time          `json:"time_to,omitempty"`
-	TimeType             string              `json:"time_type,omitempty"`
-	TimeWindowID         *int                `json:"time_window_id,omitempty"`
-	ExpectedCod          float64             `json:"expected_cod,omitempty"`
-	Remarks              string              `json:"remarks,omitempty"`
-	ServiceTime          int                 `json:"service_time,omitempty"`
-	AddressAttributes    *Address            `json:"address_attributes,omitempty"`
-	Measurements         []MeasurementParams `json:"measurements_attributes,omitempty"`
-	CustomFieldGroupID   int                 `json:"custom_field_group_id,omitempty"`
-	CustomFields         []CustomField       `json:"custom_fields_attributes,omitempty"`
-	TagList              []string            `json:"tag_list,omitempty"`
-	Photos               []Photo             `json:"photos_attributes,omitempty"`
-	VehicleSkillList     []string            `json:"vehicle_skill_list,omitempty"`
-	VehiclePartSkillList []string            `json:"vehicle_part_skill_list,omitempty"`
-	DriverSkillList      []string            `json:"driver_skill_list,omitempty"`
+type JobUpdateParams struct {
+	JobType            string                `json:"job_type,omitempty"`
+	Remarks            string                `json:"remarks,omitempty"`
+	TagList            []string              `json:"tag_list,omitempty"`
+	CustomerID         int                   `json:"customer_id,omitempty"`
+	BaseTaskAttributes *UpdateBaseTaskParams `json:"base_task_attributes,omitempty"`
+	TasksAttributes    []TaskParams          `json:"tasks_attributes,omitempty"`
+}
+
+type UpdateBaseTaskParams struct {
+	InvoiceNumber        string   `json:"invoice_number,omitempty"`
+	Remarks              string   `json:"remarks,omitempty"`
+	VehicleSkillList     []string `json:"vehicle_skill_list,omitempty"`
+	VehiclePartSkillList []string `json:"vehicle_part_skill_list,omitempty"`
+	DriverSkillList      []string `json:"driver_skill_list,omitempty"`
+	TrackingID           string   `json:"tracking_id,omitempty"`
+	ExpectedCOD          int      `json:"expected_cod,omitempty"`
+	CustomFieldGroupID   int      `json:"custom_field_group_id,omitempty"`
+	BaseTaskParams
 }
 
 type Photo struct {

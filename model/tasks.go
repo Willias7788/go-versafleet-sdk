@@ -93,3 +93,33 @@ type TaskListOptions struct {
 	JobID         *int    `url:"job_id,omitempty" json:"job_id,omitempty"`
 	ID            *int    `url:"id,omitempty" json:"id,omitempty"`
 }
+
+type TaskRequest struct {
+	TaskAttributes TaskParams `json:"task_attributes,omitempty"`
+}
+
+// TaskParams for sub-tasks of a job
+type TaskParams struct {
+	ID                   int                 `json:"id,omitempty"`       // For Update
+	Destroy              bool                `json:"_destroy,omitempty"` // For Update
+	Price                float64             `json:"price,omitempty"`
+	InvoiceNumber        string              `json:"invoice_number,omitempty"`
+	TrackingID           string              `json:"tracking_id,omitempty"`
+	TimeFrom             *string             `json:"time_from,omitempty"`
+	TimeTo               *string             `json:"time_to,omitempty"`
+	TimeType             TimeType            `json:"time_type,omitempty"`
+	TimeWindowID         *int                `json:"time_window_id,omitempty"`
+	ExpectedCod          float64             `json:"expected_cod,omitempty"`
+	Remarks              string              `json:"remarks,omitempty"`
+	ServiceTime          int                 `json:"service_time,omitempty"`
+	AddressAttributes    *Address            `json:"address_attributes,omitempty"`
+	BillingAccountID     *int                `json:"billing_account_id,omitempty"`
+	Measurements         []MeasurementParams `json:"measurements_attributes,omitempty"`
+	CustomFieldGroupID   int                 `json:"custom_field_group_id,omitempty"`
+	CustomFields         []CustomField       `json:"custom_fields_attributes,omitempty"`
+	TagList              []string            `json:"tag_list,omitempty"`
+	Photos               []Photo             `json:"photos_attributes,omitempty"`
+	VehicleSkillList     []string            `json:"vehicle_skill_list,omitempty"`
+	VehiclePartSkillList []string            `json:"vehicle_part_skill_list,omitempty"`
+	DriverSkillList      []string            `json:"driver_skill_list,omitempty"`
+}

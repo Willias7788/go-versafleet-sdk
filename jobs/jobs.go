@@ -59,7 +59,7 @@ func (s *Service) Create(ctx context.Context, job *model.JobParams) (*model.Job,
 	return &createdJob.Job, nil
 }
 
-func (s *Service) Update(ctx context.Context, jobId string, job *model.JobParams) (*model.Job, error) {
+func (s *Service) Update(ctx context.Context, jobId string, job *model.JobUpdateParams) (*model.Job, error) {
 	var updatedJob model.JobResponse
 	err := s.client.Put(ctx, fmt.Sprintf("/v2/jobs/%s", jobId), job, &updatedJob)
 	if err != nil {

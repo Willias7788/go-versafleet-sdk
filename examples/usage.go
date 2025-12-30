@@ -42,10 +42,11 @@ func main() {
 	fmt.Println("Successfully authenticated (verified via /jobs)!")
 	runJob := true
 	runTask := false
-	runDriver := true
-	runCustomer := true
-	runUpload := true
-	runCreateJob := true
+	runDriver := false
+	runCustomer := false
+	runUpload := false
+	runCreateJob := false
+	runUpdateTask := true
 	jobService := jobs.New(c)
 	tasksService := tasks.New(c)
 	driversService := drivers.New(c)
@@ -110,9 +111,26 @@ func main() {
 	}
 
 	if runCreateJob {
-		fmt.Println("\nCreating Job:")
+		customerId = 30293
+		billingAccountId = 54459
+
 		timeFrom := time.Now().Format("2006-01-02 15:04:05")
 		timeTo := time.Now().Add(time.Hour * 24).Format("2006-01-02 15:04:05")
+		task := model.TaskParams{
+			Price:       20,
+			ExpectedCod: 20,
+			TimeType:    model.TimeTypeAllDay,
+			TrackingID:  "xxsxsxsxs123456",
+			TimeFrom:    &timeFrom,
+			TimeTo:      &timeTo,
+			AddressAttributes: &model.Address{
+				Line1:   "Anywhere",
+				City:    "Singapore",
+				Country: "Singapore",
+				Zip:     "610254",
+			},
+		}
+		fmt.Println("\nCreating Job:")
 		timeType := model.TimeTypeAllDay
 		job := model.JobParams{
 			BaseTaskAttributes: &model.BaseTaskParams{
@@ -121,8 +139,8 @@ func main() {
 				TimeType:         &timeType,
 				BillingAccountID: &billingAccountId,
 				AddressAttributes: &model.Address{
-					Line1:   "123 Main St",
-					City:    "Anytown",
+					Line1:   "2 Pandan Road",
+					City:    "Singapore",
 					Country: "Singapore",
 					Zip:     "609254",
 				},
@@ -130,7 +148,11 @@ func main() {
 
 			JobType:    "delivery",
 			CustomerID: customerId,
+			TasksAttributes: []model.TaskParams{
+				task,
+			},
 		}
+
 		_ = billingAccountId
 		jobCreated, err := jobService.Create(ctx, &job)
 		if err != nil {
@@ -140,6 +162,23 @@ func main() {
 		}
 	}
 
+	if runUpdateTask {
+		taskId := "28943974"
+		billingAccountId = 54459
+		fmt.Println("\nUpdating Job:")
+		// inv := "123466"
+		task := model.TaskParams{
+			InvoiceNumber:    "123466",
+			Remarks:          "Updated Remarks",
+			BillingAccountID: &billingAccountId,
+		}
+		taskUpdated, err := tasksService.Update(ctx, taskId, &task)
+		if err != nil {
+			fmt.Printf("Error updating job: %v\n", err)
+		} else {
+			fmt.Printf("Job updated: %s (ID: %v)\n", taskUpdated.InvoiceNumber, taskUpdated.ID)
+		}
+	}
 	// // 8. Use Account Service
 	// accountService := account.New(c)
 	// fmt.Println("\nShow Account:")
