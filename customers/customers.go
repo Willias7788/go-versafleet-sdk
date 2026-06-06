@@ -54,6 +54,7 @@ func (s *Service) Create(ctx context.Context, customer *model.Customer) (*model.
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("@@@created customer response", createdCustomer)
 	return &createdCustomer.Customer, nil
 }
 
