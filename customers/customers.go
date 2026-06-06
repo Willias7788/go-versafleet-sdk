@@ -46,12 +46,15 @@ func (s *Service) Get(ctx context.Context, id string) (*model.CustomerDetail, er
 
 // Create creates a new customer
 func (s *Service) Create(ctx context.Context, customer *model.Customer) (*model.Customer, error) {
-	var createdCustomer model.Customer
+	type CreateCustomerResponse struct {
+		Customer model.Customer `json:"customer"`
+	}
+	var createdCustomer CreateCustomerResponse
 	err := s.client.Post(ctx, "/customers", customer, &createdCustomer)
 	if err != nil {
 		return nil, err
 	}
-	return &createdCustomer, nil
+	return &createdCustomer.Customer, nil
 }
 
 // Update updates an existing customer
