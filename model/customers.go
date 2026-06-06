@@ -1,14 +1,14 @@
 package model
 
 type Customer struct {
-	ID                        int             `json:"id"`
-	GUID                      string          `json:"guid"`
+	ID                        int             `json:"id,omitempty"`
+	GUID                      string          `json:"guid,omitempty"`
 	Name                      string          `json:"name"`
 	Email                     string          `json:"email"`
 	ContactPerson             string          `json:"contact_person"`
 	ContactNumber             string          `json:"contact_number"`
-	LogoURL                   string          `json:"logo_url"`
-	Archived                  bool            `json:"archived"`
+	LogoURL                   string          `json:"logo_url,omitempty"`
+	Archived                  bool            `json:"archived,omitempty"`
 	BillingAccountsAttributes *BillingAccount `json:"billing_accounts_attributes,omitempty"`
 }
 
