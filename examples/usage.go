@@ -40,13 +40,13 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Successfully authenticated (verified via /jobs)!")
-	runJob := true
+	runJob := false
 	runTask := false
 	runDriver := false
-	runCustomer := false
+	runCustomer := true
 	runUpload := false
 	runCreateJob := false
-	runUpdateTask := true
+	runUpdateTask := false
 	jobService := jobs.New(c)
 	tasksService := tasks.New(c)
 	driversService := drivers.New(c)
@@ -97,6 +97,21 @@ func main() {
 
 	// 7. Use Customers Service
 	if runCustomer {
+		// Test Create Customer
+		fmt.Println("\nCreating Customer:")
+		newCust := model.Customer{
+			Name:          fmt.Sprintf("Test Customer %d", time.Now().Unix()),
+			Email:         fmt.Sprintf("test_customer_%d@example.com", time.Now().Unix()),
+			ContactPerson: "Test Contact",
+			ContactNumber: "91234567",
+		}
+		createdCust, err := customersService.Create(ctx, &newCust)
+		if err != nil {
+			log.Printf("Error creating customer: %v", err)
+		} else {
+			fmt.Printf("Successfully created customer: %s (ID: %d)\n", createdCust.Name, createdCust.ID)
+		}
+
 		fmt.Println("\nListing Customers:")
 		custOpt := model.CustomerListOptions{}
 		custOpt.PerPage = 5

@@ -24,7 +24,7 @@ type BillingAccount struct {
 	Email               string    `json:"email"`
 	ContactPerson       string    `json:"contact_person"`
 	ContactNumber       string    `json:"contact_number"`
-	Archived            bool      `json:"archived"`
+	Archived            bool      `json:"archived,omitempty"`
 	Addresses           []Address `json:"addresses,omitempty"`
 	AddressesAttributes *Address  `json:"addresses_attributes,omitempty"`
 }

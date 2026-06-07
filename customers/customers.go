@@ -3,7 +3,6 @@ package customers
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/Willias7788/go-versafleet-sdk/client"
 	"github.com/Willias7788/go-versafleet-sdk/model"
@@ -55,7 +54,7 @@ func (s *Service) Create(ctx context.Context, customer *model.Customer) (*model.
 	if err != nil {
 		return nil, err
 	}
-	log.Println("@@@created customer response", createdCustomer)
+
 	return &createdCustomer.Customer, nil
 }
 
