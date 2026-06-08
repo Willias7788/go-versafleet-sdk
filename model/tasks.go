@@ -10,7 +10,7 @@ type Task struct {
 	AccountCreatedID         *int                 `json:"account_created_id"`
 	AccountID                *int                 `json:"account_id"`
 	Price                    float64              `json:"price"`
-	InvoiceNumber            string               `json:"invoice_number"`
+	InvoiceNumber            string               `json:"invoice_number,omitempty"`
 	TrackingID               string               `json:"tracking_id"`
 	TimeFrom                 string               `json:"time_from"`
 	TimeTo                   string               `json:"time_to"`
